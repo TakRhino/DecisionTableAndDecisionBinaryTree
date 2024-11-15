@@ -1,0 +1,57 @@
+@startuml
+interface Parameter {}
+
+class Condition {}
+
+abstract class ConditionStub<T extends Parameter> {
+    + <<Create>> ConditionStub(Class<T>,Predicate<T>)
+    + Condition<T> asMatch()
+    + Condition<T> asNotMatch()
+}
+Condition "2" -- "1" ConditionStub
+
+interface ActionResult {}
+
+class Action<T extends ActionResult> {
+    + T result()
+}
+
+class DecisionRule {
+    + DecisionRule when(Condition<?>)
+    + DecisionRule then(ActionResult)
+    + ActionResult getResult()
+    + boolean hasAction()
+}
+
+abstract class DecisionTable {
+    # <<Create>> DecisionTable()
+    # {abstract}Set<DecisionRule> initializeDecisionRules()
+    + ActionResult resolve(Set<Parameter>)
+}
+
+Condition *-- Parameter
+Action *-- ActionResult
+Condition "1..*" - DecisionRule
+ConditionStub *- Parameter
+DecisionRule - "1" Action
+DecisionRule "1..*" -- DecisionTable
+
+class impl.SampleParameter {
+    + <<Create>> SampleParameter(String)
+    + String value()
+}
+
+class impl.SampleResult {
+    + <<Create>> SampleResult(boolean)
+    + boolean ok()
+}
+
+class impl.SampleDecisionTable {
+    # Set<DecisionRule> initializeDecisionRules()
+}
+
+Parameter <|.. impl.SampleParameter
+ActionResult <|.. impl.SampleResult
+DecisionTable <|-- impl.SampleDecisionTable
+
+@enduml

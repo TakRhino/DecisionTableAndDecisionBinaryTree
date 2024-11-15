@@ -1,0 +1,57 @@
+@startuml
+interface Node {}
+interface Parameter {}
+interface Result {}
+
+class DecisionNode<T extends Parameter> {
+    + boolean isDecisionNode()
+    + boolean isLeafNode()
+    + Node selectNextNode(Parameter)
+    + {static} Builder<T> builder(Class<T>,Predicate<T>)
+}
+
+class DecisionNode$Builder {
+    + Builder<T> addTrueNode(Node)
+    + Builder<T> addFalseNode(Node)
+    + DecisionNode<T> build()
+}
+DecisionNode$Builder -+ DecisionNode
+
+class LeafNode<T extends Result> {
+    + {static} LeafNode<T> create(T)
+    + boolean isDecisionNode()
+    + boolean isLeafNode()
+    + T result()
+}
+Node <|.. LeafNode
+
+abstract class DecisionTree {
+    # <<Create>> DecisionTree()
+    # {abstract}DecisionNode<?> initialize()
+    + Result resolve(Set<Parameter>)
+}
+Node <|.. DecisionNode
+
+DecisionNode *-- Parameter
+LeafNode *-- Result
+DecisionNode "1..*" -- "1" DecisionTree
+LeafNode "2..*" -- "1" DecisionTree
+
+class impl.SomeParameter {
+    + <<Create>> SomeParameter(int)
+    + int value()
+}
+Parameter <|.. SomeParameter
+
+class impl.SomeResult {
+    + <<Create>> SomeResult(boolean)
+    + boolean result()
+}
+Result <|.. SomeResult
+
+class impl.SomeDecisionTree {
+    # DecisionNode<?> initialize()
+}
+DecisionTree <|-- impl.SomeDecisionTree
+
+@enduml
